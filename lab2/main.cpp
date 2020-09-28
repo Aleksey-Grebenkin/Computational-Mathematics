@@ -75,19 +75,6 @@ vector<double> Gaus(vector<vector<double>>& a, vector<double>& b,int n)
     }
     return x;
 }
-/*double Norm(const vector<vector<double>>& v, int n, int m)
-{
-    int i, j;
-    double sum = 0;
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < m; j++) {
-            sum += (v[i][j] * v[i][j]);
-        }
-    }
-    sum = sqrt(sum);
-    return sum;
-}
-*/
 
 vector<double> Seidel( vector<vector<double>>& a,  vector<double>& b,int n, double eps)
 {
