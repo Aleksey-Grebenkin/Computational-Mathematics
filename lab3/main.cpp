@@ -54,23 +54,42 @@ double u_cal2 (double u, int n) {
      return temp;
 }
 
-double interpolateNewton(vector<double> x,vector<vector<double>> differences,double x_current, float left_half) {
-    double sum;
-    if (left_half)
+
+double dy(vector<double> x, vector<double> y)
+{
+    if(y.size()>2)
     {
-        sum = differences[0][0];
-        double u = (x_current - x[0]) / (x[1] - x[0]);
-        for (int i = 1; i < x.size(); i++)
-            sum += (u_cal1(u, i) * differences[0][i]) / fact(i);
+        vector<double>x_left =x;
+        vector<double>y_left =y;
+        x_left.erase(x_left.begin());
+        y_left.erase(y_left.begin());
+        vector<double>x_right =x;
+        vector<double>y_right =y;
+        x_right.erase(x_right.end()-1);
+        y_right.erase(y_right.end()-1);
+        return (dy(x_left,y_left)-dy(x_right,y_right))/(x[x.size()-1]-x[0]);
     }
-    else
+    else if(y.size()==2)
     {
-        sum = differences[x.size()-1][0];
-        double u = (x_current - x[x.size()-1]) / (x[1] - x[0]);
-        for (int i = 1; i < x.size(); i++)
-            sum += (u_cal2(u, i) * differences[x.size()-1][i]) / fact(i);
+        return (y[1]-y[0])/(x[1]-x[0]);
     }
-    return sum;
+    return 0;
+}
+
+double interpolateNewton(vector<double> x,vector<double> y,double x_current)
+{
+    double res = y[0];
+    double tmp;
+    for (int i=1; i<y.size();i++)
+    {
+        vector <double> x_list = vector<double>(x.begin(),x.begin()+i+1);
+        vector <double> y_list = vector<double>(y.begin(),y.begin()+i+1);
+        tmp=1;
+        for(int j=0;j<i;j++)
+            tmp*=x_current-x[j];
+        res+=dy(x_list,y_list)*tmp;
+    }
+    return res;
 }
 
 vector <double> interpolateLeastSquare(vector<double> x, vector<double>y, int K)
@@ -184,38 +203,14 @@ int main()
     }
     
     cout<<endl;
+    
     //НЬЮТОН
-    vector<vector<double>> differences1; //таблица конечных разностей вперед
-    vector<vector<double>> differences2; //таблица конечных разностей назад
-    differences1.assign(N, vector<double>(N));
-    differences2.assign(N, vector<double>(N));
-    for (int i = 0; i < x.size(); i++)
-    {
-        differences1[i][0]=y[i];
-        differences2[i][0]=y[i];
-    }
-    for (int i = 1; i < x.size(); i++)
-    {
-        for (int j = 0; j < x.size() - i; j++)
-        {
-            differences1[j][i]=differences1[j + 1][i - 1] - differences1[j][i - 1];
-        }
-        for (int j = x.size()-1; j >= i; j--)
-        {
-            differences2[j][i]=differences2[j][i - 1] - differences2[j-1][i - 1];
-        }
-    }
-    for (double x_current = x1;x_current<(x1+x2)/2;x_current+=dx)
+    
+    for (double x_current = x1;x_current<=x2;x_current+=dx)
     {
         x_newt.push_back(x_current);
-        y_newt.push_back(interpolateNewton(x,differences1,x_current,true));
+        y_newt.push_back(interpolateNewton(x,y,x_current));
     }
-
-    for (double x_current = (x1+x2)/2;x_current<=x2;x_current+=dx)
-       {
-           x_newt.push_back(x_current);
-           y_newt.push_back(interpolateNewton(x,differences2,x_current,false));
-       }
     
     vector<double> a;
     
@@ -267,29 +262,28 @@ int main()
         cout<<x_lagr[i]<< ";"<<y_lagr[i] <<";"<<endl;
     }
      cout<<endl;
-    
+   
     for(int i=0;i<y_newt.size();i++)
     {
         cout<<x_newt[i]<< ";"<<y_newt[i]<<";"<<endl;
     }
-     cout<<endl;
+    cout<<endl;
     
     for(int i=0;i<y_squ1.size();i++)
-       {
-           cout<<x_squ1[i]<<";"<<y_squ1[i]<<";"<<endl;
-       }
+    {
+        cout<<x_squ1[i]<<";"<<y_squ1[i]<<";"<<endl;
+    }
     cout<<endl;
     
     for(int i=0;i<y_squ2.size();i++)
-       {
-           cout<<x_squ2[i]<<";"<<y_squ2[i]<<";"<<endl;
-       }
+    {
+        cout<<x_squ2[i]<<";"<<y_squ2[i]<<";"<<endl;
+    }
     cout<<endl;
     
     for(int i=0;i<y_squ3.size();i++)
-          {
-              cout<<x_squ3[i]<<";"<<y_squ3[i]<<";"<<endl;
-          }
-       cout<<endl;
-    
+    {
+        cout<<x_squ3[i]<<";"<<y_squ3[i]<<";"<<endl;
+    }
+    cout<<endl;
 }
