@@ -23,37 +23,27 @@ void init(vector<double> &x,vector<double> &y)
     }
 }
 
-double interpolateLagrange(vector<double> x, vector<double>y, double x_current) {
-    double result = 0;
-    for (int i = 0; i < N; i++) {
-        double term = y[i];
-        for (int j = 0; j < N; j++) {
-            if (j != i)
-                term *= (x_current - x[j]) / (x[i] - x[j]);
-        }
-    result += term;
-    }
-     return result;
-}
-
-int fact(int a)
+double l(int index, vector<double> x, double x_current )
 {
-    if (a==1) return 1;
-    return fact(a-1)*a;
+    double l=1;
+    for (int i=0;i<x.size();i++)
+    {
+        if (i!=index)
+        {
+            l*=(x_current-x[i])/(x[index]-x[i]);
+        }
+    }
+    return l;
 }
 
-double u_cal1 (double u, int n) {
-     double temp = u;
-     for (int i = 1; i < n; i++) temp *= (u - i);
-     return temp;
+double interpolateLagrange(vector<double> x, vector<double>y, double x_current) {
+    double res = 0;
+    for (int i = 0; i < x.size(); i++)
+    {
+        res+=y[i]*l(i,x,x_current);
+    }
+     return res;
 }
-
-double u_cal2 (double u, int n) {
-     double temp = u;
-     for (int i = 1; i < n; i++) temp *= (u + i);
-     return temp;
-}
-
 
 double dy(vector<double> x, vector<double> y)
 {
@@ -203,8 +193,39 @@ int main()
     }
     
     cout<<endl;
-    
     //НЬЮТОН
+   /* vector<vector<double>> differences1; //таблица конечных разностей вперед
+    vector<vector<double>> differences2; //таблица конечных разностей назад
+    differences1.assign(N, vector<double>(N));
+    differences2.assign(N, vector<double>(N));
+    for (int i = 0; i < x.size(); i++)
+    {
+        differences1[i][0]=y[i];
+        differences2[i][0]=y[i];
+    }
+    for (int i = 1; i < x.size(); i++)
+    {
+        for (int j = 0; j < x.size() - i; j++)
+        {
+            differences1[j][i]=differences1[j + 1][i - 1] - differences1[j][i - 1];
+        }
+        for (int j = x.size()-1; j >= i; j--)
+        {
+            differences2[j][i]=differences2[j][i - 1] - differences2[j-1][i - 1];
+        }
+    }
+    for (double x_current = x1;x_current<(x1+x2)/2;x_current+=dx)
+    {
+        x_newt.push_back(x_current);
+        y_newt.push_back(interpolateNewton(x,differences1,x_current,true));
+    }
+
+    for (double x_current = (x1+x2)/2;x_current<=x2;x_current+=dx)
+       {
+           x_newt.push_back(x_current);
+           y_newt.push_back(interpolateNewton(x,differences2,x_current,false));
+       }
+    */
     
     for (double x_current = x1;x_current<=x2;x_current+=dx)
     {
@@ -262,28 +283,27 @@ int main()
         cout<<x_lagr[i]<< ";"<<y_lagr[i] <<";"<<endl;
     }
      cout<<endl;
-   
     for(int i=0;i<y_newt.size();i++)
     {
         cout<<x_newt[i]<< ";"<<y_newt[i]<<";"<<endl;
     }
-    cout<<endl;
+     cout<<endl;
     
     for(int i=0;i<y_squ1.size();i++)
-    {
-        cout<<x_squ1[i]<<";"<<y_squ1[i]<<";"<<endl;
-    }
+       {
+           cout<<x_squ1[i]<<";"<<y_squ1[i]<<";"<<endl;
+       }
     cout<<endl;
     
     for(int i=0;i<y_squ2.size();i++)
-    {
-        cout<<x_squ2[i]<<";"<<y_squ2[i]<<";"<<endl;
-    }
+       {
+           cout<<x_squ2[i]<<";"<<y_squ2[i]<<";"<<endl;
+       }
     cout<<endl;
     
     for(int i=0;i<y_squ3.size();i++)
-    {
-        cout<<x_squ3[i]<<";"<<y_squ3[i]<<";"<<endl;
-    }
-    cout<<endl;
+          {
+              cout<<x_squ3[i]<<";"<<y_squ3[i]<<";"<<endl;
+          }
+       cout<<endl;
 }
